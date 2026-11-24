@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Video;
 using System.Collections;
+using UnityEngine.InputSystem;
 
 public class ActivarVideosLat : MonoBehaviour
 {
@@ -42,18 +43,26 @@ public class ActivarVideosLat : MonoBehaviour
             return;
 
 
-        if (Input.touchCount > 0 &&
-            Input.GetTouch(0).phase == TouchPhase.Began)
+        if (Touchscreen.current != null)
         {
-            DetectarToque(Input.GetTouch(0).position);
+            var touch = Touchscreen.current.primaryTouch;
+
+            if (touch.press.wasPressedThisFrame)
+            {
+                DetectarToque(touch.position.ReadValue());
+            }
         }
 
-        if (Input.GetMouseButtonDown(0))
+    
+        if (Mouse.current != null)
         {
-            DetectarToque(Input.mousePosition);
+            if (Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                DetectarToque(Mouse.current.position.ReadValue());
+            }
         }
     }
-
+    
     void DetectarToque(Vector2 posicion)
     {
         Ray rayo = camaraAR.ScreenPointToRay(posicion);
