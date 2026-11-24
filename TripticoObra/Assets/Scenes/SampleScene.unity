@@ -182,7 +182,7 @@ VideoPlayer:
   m_EnabledAudioTracks: 
   m_DirectAudioMutes: 
   m_ControlledAudioTrackCount: 0
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_SkipOnDrop: 1
   m_Looping: 1
   m_WaitForFirstFrame: 1
@@ -235,7 +235,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 82f03a908c007a3489443c193d03db0e, type: 2}
+  - {fileID: 2100000, guid: bb1ceb55aa73d8247b9215bb0343f543, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -496,7 +496,7 @@ VideoPlayer:
   m_EnabledAudioTracks: 
   m_DirectAudioMutes: 
   m_ControlledAudioTrackCount: 0
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_SkipOnDrop: 1
   m_Looping: 1
   m_WaitForFirstFrame: 1
@@ -549,7 +549,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 82f03a908c007a3489443c193d03db0e, type: 2}
+  - {fileID: 2100000, guid: bb1ceb55aa73d8247b9215bb0343f543, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -844,8 +844,8 @@ GameObject:
   - component: {fileID: 1868730811}
   - component: {fileID: 1868730810}
   - component: {fileID: 1868730812}
-  - component: {fileID: 1868730814}
   - component: {fileID: 1868730813}
+  - component: {fileID: 1868730814}
   m_Layer: 0
   m_Name: ImageTarget
   m_TagString: Untagged
@@ -967,15 +967,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f1cc79aedb19ef41bb64e94eaa6a89a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ActivarVideosLat
+  objetoIzquierda: {fileID: 785661550}
+  objetoDerecha: {fileID: 176680429}
   videoIzquierda: {fileID: 785661552}
   videoDerecha: {fileID: 176680431}
   rendererIzquierda: {fileID: 785661554}
   rendererDerecha: {fileID: 176680433}
+  zonaInteractiva: {fileID: 1489193884}
   camaraAR: {fileID: 359043447}
-  minX: 0.35
-  maxX: 0.65
-  minY: 0.35
-  maxY: 0.65
+  duracionAparicion: 1.5
 --- !u!114 &1868730814
 MonoBehaviour:
   m_ObjectHideFlags: 0

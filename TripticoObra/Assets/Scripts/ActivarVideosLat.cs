@@ -1,8 +1,13 @@
 using UnityEngine;
 using UnityEngine.Video;
+using System.Collections;
 
 public class ActivarVideosLat : MonoBehaviour
 {
+    [Header("Objetos laterales")]
+    public GameObject objetoIzquierda;
+    public GameObject objetoDerecha;
+
     [Header("Videos secundarios")]
     public VideoPlayer videoIzquierda;
     public VideoPlayer videoDerecha;
@@ -11,24 +16,24 @@ public class ActivarVideosLat : MonoBehaviour
     public Renderer rendererIzquierda;
     public Renderer rendererDerecha;
 
+    [Header("Zona interactiva")]
+    public Collider zonaInteractiva;
+
     [Header("Camara AR")]
     public Camera camaraAR;
 
-    [Header("Zona sensible (UV)")]
-    [Range(0f, 1f)] public float minX = 0.35f;
-    [Range(0f, 1f)] public float maxX = 0.65f;
-    [Range(0f, 1f)] public float minY = 0.35f;
-    [Range(0f, 1f)] public float maxY = 0.65f;
+    [Header("Animacion")]
+    public float duracionAparicion = 1.5f;
 
     private bool videosActivados = false;
 
-    void Start()
+    void Awake()
     {
-        rendererIzquierda.enabled = false;
-        rendererDerecha.enabled = false;
+        if (objetoIzquierda != null)
+            objetoIzquierda.SetActive(false);
 
-        videoIzquierda.Stop();
-        videoDerecha.Stop();
+        if (objetoDerecha != null)
+            objetoDerecha.SetActive(false);
     }
 
     void Update()
@@ -49,13 +54,14 @@ public class ActivarVideosLat : MonoBehaviour
         }
     }
 
-    void DetectarToque(Vector2 posicionPantalla)
+    void DetectarToque(Vector2 posicion)
     {
-        Ray rayo = camaraAR.ScreenPointToRay(posicionPantalla);
+        Ray rayo = camaraAR.ScreenPointToRay(posicion);
 
         if (Physics.Raycast(rayo, out RaycastHit hit))
         {
-            if (hit.collider.gameObject.name == "ZonaInteractiva")
+            if (zonaInteractiva != null &&
+                hit.collider == zonaInteractiva)
             {
                 MostrarVideos();
             }
@@ -64,12 +70,111 @@ public class ActivarVideosLat : MonoBehaviour
 
     void MostrarVideos()
     {
-        videosActivados = true;
+         videosActivados = true;
 
-        rendererIzquierda.enabled = true;
-        rendererDerecha.enabled = true;
+        objetoIzquierda.SetActive(true);
+        objetoDerecha.SetActive(true);
 
-        videoIzquierda.Play();
-        videoDerecha.Play();
+        StartCoroutine(
+            PrepararYMostrar(videoIzquierda, rendererIzquierda)
+        );
+
+        StartCoroutine(
+            PrepararYMostrar(videoDerecha, rendererDerecha)
+        );
+    }
+
+    IEnumerator PrepararYMostrar(
+        VideoPlayer video,
+        Renderer quad)
+    {
+        if (video == null || quad == null)
+            yield break;
+
+        
+        quad.enabled = false;
+
+        
+        video.Stop();
+        video.Prepare();
+
+        while (!video.isPrepared)
+            yield return null;
+
+        
+        bool primerFotograma = false;
+
+        video.sendFrameReadyEvents = true;
+
+        VideoPlayer.FrameReadyEventHandler evento =
+            (source, frame) => primerFotograma = true;
+
+        video.frameReady += evento;
+
+        video.Play();
+
+        float espera = 0f;
+
+        while (!primerFotograma && espera < 5f)
+        {
+            espera += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        video.frameReady -= evento;
+
+        if (!primerFotograma)
+        {
+            Debug.LogWarning(
+                "No se recibio el primer fotograma de: " + video.name
+            );
+            yield break;
+        }
+
+        
+        Material material = quad.material;
+
+        
+        CambiarAlpha(material, 0f);
+
+        
+        quad.enabled = true;
+
+        
+        float tiempo = 0f;
+
+        while (tiempo < duracionAparicion)
+        {
+            tiempo += Time.unscaledDeltaTime;
+
+            float alpha = Mathf.Clamp01(
+                tiempo / duracionAparicion
+            );
+
+            CambiarAlpha(material, alpha);
+
+            yield return null;
+        }
+
+        
+        CambiarAlpha(material, 1f);
+    }
+
+    void CambiarAlpha(Material material, float alpha)
+    {
+        Color color;
+
+        if (material.HasProperty("_BaseColor"))
+        {
+            color = material.GetColor("_BaseColor");
+            color.a = alpha;
+            material.SetColor("_BaseColor", color);
+        }
+        else if (material.HasProperty("_Color"))
+        {
+            color = material.GetColor("_Color");
+            color.a = alpha;
+            material.SetColor("_Color", color);
+        }
     }
 }
